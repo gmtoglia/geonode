@@ -462,7 +462,7 @@ community."
         response = self.client.get(url_no_id)
         self.assertEquals(response.status_code, 200)
         # Config equals to that of the default map
-        config_default = default_map_config()[0]
+        config_default = default_map_config(None)[0]
         response_config_dict = json.loads(response.context['config'])
         self.assertEquals(
             config_default['about']['abstract'],
@@ -545,7 +545,7 @@ community."
         # Test GET method no COPY and no layer in params
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-        config_default = default_map_config()[0]
+        config_default = default_map_config(None)[0]
         response_config_dict = json.loads(response.content)
         self.assertEquals(
             config_default['about']['abstract'],
