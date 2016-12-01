@@ -563,6 +563,10 @@ def new_map_config(request):
 
                 if layer.storeType == "remoteStore":
                     service = layer.service
+                    if access_token:
+                        url = service.base_url+'?access_token='+access_token
+                    else:
+                        url = service.base_url
                     maplayer = MapLayer(map=map_obj,
                                         name=layer.typename,
                                         ows_url=layer.ows_url,
@@ -571,13 +575,17 @@ def new_map_config(request):
                                         source_params=json.dumps({
                                             "ptype": service.ptype,
                                             "remote": True,
-                                            "url": service.base_url+'?access_token='+access_token,
+                                            "url": url,
                                             "name": service.name}))
                 else:
+                    if access_token:
+                        url = layer.ows_url+'?access_token='+access_token
+                    else:
+                        url = layer.ows_url
                     maplayer = MapLayer(
                         map=map_obj,
                         name=layer.typename,
-                        ows_url=layer.ows_url+'?access_token='+access_token,
+                        ows_url=url,
                         # use DjangoJSONEncoder to handle Decimal values
                         layer_params=json.dumps(config, cls=DjangoJSONEncoder),
                         visibility=True
