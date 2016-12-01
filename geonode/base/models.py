@@ -938,13 +938,19 @@ def do_logout(sender, user, request, **kwargs):
             old.delete()
 
         # Do GeoServer Logout
+        if 'access_token' in request.session:
+            access_token = request.session['access_token']
+        else:
+            access_token = None
+
         url = "%s%s?access_token=%s" % (settings.OGC_SERVER['default']['PUBLIC_LOCATION'],
                                         settings.OGC_SERVER['default']['LOGOUT_ENDPOINT'],
-                                        request.session['access_token'])
+                                        access_token)
 
-        header_params = {
-            "Authorization": ("Bearer %s" % request.session['access_token'])
-        }
+        if access_token:
+            header_params = {
+                "Authorization": ("Bearer %s" % access_token)
+            }
 
         param = {}
         data = urllib.urlencode(param)
@@ -974,7 +980,9 @@ def do_logout(sender, user, request, **kwargs):
         except:
             pass
 
-        del request.session['access_token']
+        if 'access_token' in request.session:
+            del request.session['access_token']
+
         request.session.modified = True
 
 
