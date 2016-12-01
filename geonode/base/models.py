@@ -926,16 +926,19 @@ def do_logout(sender, user, request, **kwargs):
     request to GeoServer
     """
     if 'access_token' in request.session:
-        Application = get_application_model()
-        app = Application.objects.get(name="GeoServer")
-        
-        # Lets delete the old one
         try:
-            old = AccessToken.objects.get(user=user, application=app)
+            Application = get_application_model()
+            app = Application.objects.get(name="GeoServer")
+
+            # Lets delete the old one
+            try:
+                old = AccessToken.objects.get(user=user, application=app)
+            except:
+                pass
+            else:
+                old.delete()
         except:
             pass
-        else:
-            old.delete()
 
         # Do GeoServer Logout
         if 'access_token' in request.session:
@@ -943,14 +946,16 @@ def do_logout(sender, user, request, **kwargs):
         else:
             access_token = None
 
-        url = "%s%s?access_token=%s" % (settings.OGC_SERVER['default']['PUBLIC_LOCATION'],
-                                        settings.OGC_SERVER['default']['LOGOUT_ENDPOINT'],
-                                        access_token)
-
         if access_token:
+            url = "%s%s?access_token=%s" % (settings.OGC_SERVER['default']['PUBLIC_LOCATION'],
+                                            settings.OGC_SERVER['default']['LOGOUT_ENDPOINT'],
+                                            access_token)
             header_params = {
                 "Authorization": ("Bearer %s" % access_token)
             }
+        else:
+            url = "%s%s" % (settings.OGC_SERVER['default']['PUBLIC_LOCATION'],
+                            settings.OGC_SERVER['default']['LOGOUT_ENDPOINT'])
 
         param = {}
         data = urllib.urlencode(param)
